@@ -1,0 +1,114 @@
+---
+title: "homeworkStat631"
+author: "Jessica Grover"
+date: "2/7/2022"
+output:
+  pdf_document: default
+  word_document: default
+---
+
+#Problem 1
+Q1. How many treatments are there?
+Ans. There are 4 treatments.
+
+Q2. How many randomizations are used?
+Ans. 29 randomizations are used.
+
+Q3.  Is this a balanced design?
+Ans. This is not a balanced design as we can see that observations are not of equal number.
+
+Q4. Does this experiment allow us to estimate error? why is it?
+Ans. Yes, this experiment allow us to estimate error.
+The reason is that if we take difference between any two responses is low, so the accuracy of prediction is high.
+
+
+#Problem 2
+Q1. How many randomizations are used?
+Ans. 02 ramdomizations are used.
+
+Q2. Is this a balanced design?
+Ans. Yes this is a balanced design as we can see that observations are of equal number.
+
+Q3. What are the experimental units? How many are there?
+Ans. Experimental units are the things to which we apply the treatments. There are 12 experimental units.
+
+Q4.  How many responses do we have?
+Ans. We have 48 responses.
+
+Q5. Are all responses statistically independent?
+Ans. Yes the responses are statically independent as the treatment of one subject won't affect the treatment of other subjects.
+
+#Problem 5
+```{r}
+library(pacman)
+p_load(gtools, knitr)
+```
+```{r}
+control <- c(54,123,248)
+treatment <- c(256,159,149)
+print(mean(treatment)-mean(control))
+```
+```{r}
+print(choose(6,3))
+```
+```{r}
+combns_all = as.data.frame(combinations(n = 6, r = 3, v = c(treatment,control),
+repeats.allowed=FALSE))
+combns_all$sumOfTreatment <- apply(combns_all, 1, sum)
+combns_all$sum_total <- sum(c(treatment,control))
+
+```
+```{r}
+combns_all$sumOfControl <- combns_all$sum_total-combns_all$sumOfTreatment
+```
+```{r}
+combns_all$meanOfTreatment <- combns_all$sumOfTreatment/3
+combns_all$meanOfControl <- combns_all$sumOfControl/3
+
+```
+```{r}
+combns_all$meanOfDiff <- abs(combns_all$meanOfTreatment-combns_all$meanOfControl)
+kable(head(combns_all))
+```
+```{r}
+print(nrow(combns_all[which(combns_all$meanOfDiff >= 46.33333),]))
+```
+```{r}
+print(nrow(combns_all))
+```
+The randomization p-value is 8/20 = 0.4.
+We fail to reject the null hypothesis at α = 0.05 significance.
+
+#Problem 6
+
+H0: µ1=µ2
+H1: µ1!=µ2
+
+```{r}
+a1<-c(11.176,7.089,8.097,11.739,11.291,10.759,6.467,8.315)
+a2<-c(5.263,6.748,7.461,7.015,8.133,7.418,3.772,8.963)
+
+n1<-8
+n2<-8
+```
+```{r}
+summary(a1)
+summary(a2)
+```
+
+```{r}
+m<-print(sd(a1)**2)
+n<-print(sd(a2)**2)
+```
+
+
+```{r}
+t.test(a1,a2)
+```
+```{r}
+power.t.test(delta=-2.5,sd=1.86,power=0.9)
+```
+```{r}
+power.t.test(delta = -1.5,sd=1.86,power=0.9)
+```
+

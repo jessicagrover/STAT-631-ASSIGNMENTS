@@ -1,0 +1,140 @@
+---
+title: "stat631finals"
+author: "Jessica Grover"
+date: "5/6/2022"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+# Problem 1
+# 1.  What are sources of variations in the data?
+Ans. The sources of variations are training programs, FBI agents and field offices.
+
+# 2. Which factors are random and which factors are fixed?
+Ans. Fixed factor is training programs and random factors are field offices and FBI agents.
+
+# 3. Are factors crossed/nested with each others?
+Ans. Yes, the factors are nested with each others. The factor office is nested into training programs.
+
+# 4. Apply linear mixed model approach or ANOVA method to evaluate the research hypothesis that there is a difference among the mean test scores of the three types of training programs. State H0, H1, p-value and conclusion.
+
+Null hypothesis (H0): The mean test scores of all the training programs are same.
+Alternative hypothesis (H1): There is a difference in mean test scores.
+
+```{r}
+library(pacman)
+p_load(lme4, lmerTest)
+data1<-c(59,81,62,48,50,53,51,54,45,52,46,65,47,48,42,44,51,58,61,52,66,43,51,49,52,55,49, 63,55,59,41,55,53,42,53,62,64,45,66,41,46,68,50,50,48,51,79,59,44,46,26,47,60,56,50,54,65, 40,44,65,42,49,45,60,60,67,40,49,56,50,50,60,66,61,61,44,49,52,51,49,46,69,45,67,46, 42,38,42,49,60)
+management <- rep(c(1,1,1,2,2,2,3,3,3),10);management <- as.factor(management)
+fbi <- rep(c(1:3), 30);fbi <- as.factor(fbi)
+df <- data.frame(data1,management,fbi)
+df
+
+
+```
+Using linear mixed model approach,
+```{r}
+model1 <- lmer(data1~management+(1|fbi:management),data = df)
+summary(model1)
+```
+Using ANOVA,
+```{r}
+anova(model1)
+
+```
+
+Since the p-value is significant at 95% confidence level, we are rejecting null hypothesis. This also proves that at least one mean test scores of training program is different.
+
+# 5. If you reject H0 in 4, use Dunnett’s method to find the best type of training programs.
+
+```{r}
+library(emmeans)
+lsm_mod <- lsmeans(model1,~management)
+dunet <- summary(contrast(lsm_mod,list("conflictmanagement vs psychology"=c(1,-1,0),"conflict managementdunet vs negotiation"=c(1,0,-1),"psychology v negotiation"=c(0,1,-1)),adjust="dunet"),infer=c(T,F),level=0.95,side="two-sided");
+dunet
+```
+
+Conclusion: The best type of training program is conflict management because 0 is not in the interval.
+
+
+# Probelm 2
+# 1.  Write down the model and Hasse diagram for this data analysis.
+
+```{r}
+data1 <- c(192,195,292,249,190,203,218,210,214,139,245,163,221,152,204,134)
+cows <- rep(c(1:4),4);cows <- as.factor(cows)
+period <- rep(c(1:4),each=4);period <- as.factor(period)
+t<- c(4,1,3,2,1,4,2,3,3,2,1,4,2,3,4,1)
+t <- as.factor(t)
+model2 <- data.frame(data1,cows,period,t)
+model2
+
+```
+The factors are: cows, time  period, diets.
+Fixed effects are: cows, diets
+Random effects are: Time period
+Crossed factors are: time period, cow
+
+# 2. Which type of designs is this?
+As the treatments, the row factor and the column factor affects response independently, we can conclude that it is latin square design.
+
+# 3. Use linear mixed model approach or ANOVA method to analyze the effects of four diets.
+```{r}
+effects1<- lmer(data1~cows+(1|period)+t,data=model2)
+summary(effects1)
+
+```
+
+```{r}
+anova(effects1)
+```
+Since the p-value of treatment is 0.6736 which is greater than 0.05, we can say that there is no significant effect because of the diet. Hence we fail to reject null hypothesis.
+
+```{r}
+library(ggplot2)
+ggplot(model2,aes(x=period,y=cows))+ geom_point(aes(x=period, y=cows))
+```
+```{r}
+geom_line(aes(x=period,y=cows))
+```
+```{r}
+ggtitle("xyplot with parallel regression lines (ANCOVA)")
+
+```
+
+# 4.  Construct 95% Tukey’s pairwise comparisons of the diets and report your findings.
+```{r}
+lsm_mod <- lsmeans(effects1,~cows)
+tukey <- summary(contrast(lsm_mod,method = "pairwise",adjust="tukey"),infer=c(T,F),level=0.95,side="two-sided");
+tukey
+```
+With the tukey's method we can say that all the intervals include zero with 95% confidence intervals. The effects of treatments are same.
+
+
+
+------------------------------------------------------------------------------------
+
+# Problem 3
+
+# 1. What are sources of variations in the data?
+The sources of variations are : cows, diets, proteins
+
+# 2. Which factors are random and which factors are fixed?
+Fixed factors are: diets
+Random factors are: cows, proteins
+
+# 5. Based on the answers of the previous questions, apply linear mixed model approach to evaluate the research hypothesis that there is a difference between the three diets. State H0, H1, p-value and conclusion.
+```{r}
+prob3<-read.csv("Prob3.csv")
+head(prob3)
+```
+```{r}
+model4<-lmer(protein~1 + Diet+(1|week)+(1|Cow),data=prob3)
+model4
+```
+
+```{r}
+anova(model4)
+```
+

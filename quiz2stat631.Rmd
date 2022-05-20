@@ -1,0 +1,54 @@
+---
+title: "quiz2stat631"
+author: "Jessica Grover"
+date: "3/24/2022"
+output:
+  word_document: default
+  pdf_document: default
+---
+#a.Construct the side-by-side boxplot to compare lengths of time among different types of cars and write down your observations.
+```{r}
+d1<-read.csv("CarRental.csv",header = TRUE)
+library(emmeans)
+head(d1)
+d1$ftrt<- as.factor(d1$ind)
+boxplot(values~ftrt, data = d1)
+```
+The box plot above confirms that the time taken by the compact is lowest and the time taken by the minivan is the largest.
+
+#b. Is there any statistical evidence that different types of cars are rented for varying lengths of time? Perform the corresponding test and report your conclusions.
+```{r}
+model1<-lm(values~ftrt,data=d1)
+anova(model1)
+```
+The p-value is less than 0.05, so we are rejecting the null hypothesis. We are 95% confident that there is atleast one difference in the rental car's length of time.
+```{r}
+plot(model1,which=2)
+```
+The above plot concludes that assumptions seems to be reasonable.
+
+
+#C.Apply Tukey’s simultaneous confidence interval method with α = 0.05 to find the type of cars that has the shortest rental time and the type of cars that has the largest rental time.
+```{r}
+library(emmeans)
+lsm1<- emmeans(model1, ~ftrt)
+tk<- summary(contrast(lsm1,method="pairwise",adjust="tukey"),infer=c(T,T),level=0.95,side="two-sided")
+tk
+```
+It is seen that luxury cars has shortest rental time. Minivan has the highest rental time because zero not included and it means that population parameters are highly significant
+
+
+#d. Check the assumptions of your model. Are the conclusions from your model valid?
+```{r}
+library(car)
+
+#summary(mod)
+qqPlot(model1$residuals)
+shapiro.test(model1$residuals)
+```
+```{r}
+plot(model1$fitted.values,model1$residuals)
+
+```
+There is  constant variance so it  does not violates the assumption of variance.
+

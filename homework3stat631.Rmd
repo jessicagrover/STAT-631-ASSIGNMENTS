@@ -1,0 +1,56 @@
+---
+title: "Hm3stat631"
+author: "Jessica Grover"
+date: "3/1/2022"
+output:
+  word_document: default
+  pdf_document: default
+---
+#Problem 2
+Reading the table
+```{r}
+cars<-read.table("car.dat",header = TRUE)
+cars
+```
+#a.
+```{r}
+
+cars$ftype<-as.factor(cars$type)
+cars
+
+```
+```{r}
+model1<-lm(response~ftype,data=cars)
+anova(model1)
+```
+
+The null hypothesis is rejected. There is a significant differance between means oil use in given cars as p-value is less than 0.05. Hence we can conclude that data provides significant evidence that there is a difference in the mean oil use of the cars.
+
+
+#b.
+```{r}
+library(emmeans)
+lsmcars<-lsmeans(model1,~ftype)
+print(lsmcars)
+```
+```{r}
+levels(cars$ftype)
+```
+#b1.
+```{r}
+contrast(lsmcars,list("ImportedWithExported"=c(-1/4,-1/4,1/2,-1/4,-1/4,1/2)))
+```
+
+```{r}
+summary(contrast(lsmcars,list("ImportedWithExported"=c(-1/4,-1/4,1/2,-1/4,-1/4,1/2))),infer=c(T,T),level=0.95,side="two-sided")
+```
+Since we have interval of (0.506,0.932), it is clear that there is no 0. It means, the usage of oils of imported cars is more than the exported cars.
+
+#b2.
+```{r}
+contrast(lsmcars,list("CheapWithExpensive"=c(1/3,1/3,1/3,-1/3,-1/3,-1/3)))
+```
+```{r}
+summary(contrast(lsmcars,list("CheapWithExpensive"=c(1/3,1/3,1/3,-1/3,-1/3,-1/3))),infer = c(T,T),level = 0.95,side="two-sided")
+```
+Since the interval is (-0.967,-0.565), it does not involve 0. The value is negative so we can conclude that oil usage of cheaper cars are less than the expensive cars.

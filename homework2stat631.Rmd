@@ -1,0 +1,114 @@
+---
+title: "hm2stat631"
+author: "Jessica Grover"
+date: "2/16/2022"
+output:
+  pdf_document: default
+  word_document: default
+---
+
+#Exercise 3.1
+The problem specifies that rats were given four different types of diet. Therefore, treatments are 4. According to the table given, responses are 29. 
+
+Inserting data
+```{r}
+group1<-c(3.52,3.36,3.57,4.19,3.88,3.76,3.94)
+group2<-c(3.47,3.73,3.38,3.87,3.69,3.51,3.35,3.64)
+group3<-c(3.54,3.52,3.61,3.76,3.65,3.51)
+group4<-c(3.74,3.83,3.87,4.08,4.31,3.98,3.86,3.71)
+
+diets<-c(group1,group2,group3,group4)
+```
+
+Computing overall mean
+```{r}
+mean(diets)
+```
+Computing treatment effects
+```{r}
+trt1<-mean(group1)-mean(diets)
+trt2<-mean(group2)-mean(diets)
+trt3<-mean(group3)-mean(diets)
+trt4<-mean(group4)-mean(diets)
+trts<-c(trt1,trt2,trt3,trt4)
+trts
+trt<-c(rep(1,7),rep(2,8),rep(3,6),rep(4,8))
+df<-data.frame(diets,trt)
+```
+Let us set up the hypothesis test.
+
+H0: All the four group's means are equal.
+H1: Atleast one of the mean is different.
+
+Let us now factor "df". It will be converted into factor variable. 
+A factor variable is treated as qualitative material by R.
+
+```{r}
+df$ftrt<-as.factor(df$trt)
+df
+```
+Using ANOVA to do the analysis of variance,
+```{r}
+model<-lm(diets~ftrt,data=df)
+anova(model)
+```
+
+The overall mean is 3.718276
+
+Fvalue is the division of two mean squares, i.e, 0.192736/0.041376
+
+If H0 is true, it means that Fvalue should be around 1 but it is 4.6581 and p-value is 0.01016. It is clear that there are differences in the means of the diet and we can reject the null hypothesis.
+
+
+#Exercise 3.3
+The table data has moisture content of the silage. Let us first insert the data.
+
+```{r}
+response<- c(80.5, 79.3, 79, 89.1, 75.7, 81.2, 77.8, 79.5, 77, 76.7, 77.2, 78.6)
+trt<- rep(1:4, each=3)
+df<- data.frame(response,trt)
+```
+df
+Factor variable
+```{r}
+df$ftrt<-as.factor(df$trt)
+df
+
+```
+
+Using ANOVA to find variance,
+```{r}
+model<-lm(response~ftrt,data=df)
+anova(model)
+```
+
+Here, we can see that p-value is 0.444 which is greater than 0.05.
+Therefore, null hypothesis cannot be rejected.
+There is no sufficient evidence to conclude that all four treatment yield the same average
+moisture content.
+
+
+#Exercise 3.4
+The group means are given. Let us first insert the data.
+```{r}
+means<-c(6.5,4.5,5.7,5.7,5.1)
+grand<-means
+x<-mean(grand)
+x<-rep(x,5)
+sst<-3*sum((means-x)^2)
+mse<-0.75
+sse<-mse*10
+mst<-sst/4
+fstat<-mst/mse
+pvalue<-pf(fstat,4,10,lower.tail = FALSE)
+
+response<-c("treatment","error","total")
+df<-c(4, 10, 14)
+ss<-c(sst,sse,NA)
+ms<-c(mst,mse,NA)
+f<-c(fstat,NA,NA)
+pr<-c(pvalue,NA,NA)
+table<-data.frame(response,df,ss,ms,f,pr)
+head(table)
+```
+
